@@ -7,8 +7,6 @@ const messageSchema = new mongoose.Schema(
     email: { type: String, trim: true },
     mobile: { type: String, trim: true },
     message: { type: String, required: true, trim: true },
-    ip: String,
-    userAgent: String,
   },
   { timestamps: true }
 );

@@ -14,18 +14,12 @@ const contactController = async (req, res) => {
       });
     }
 
-    // Optional user info
-    const ip = req.ip || req.headers['x-forwarded-for'] || req.connection?.remoteAddress;
-    const userAgent = req.headers['user-agent'] || '';
-
     // ✅ Save message to MongoDB
     const newMessage = await Message.create({
       name,
       email,
       mobile,
       message,
-      ip,
-      userAgent,
     });
 
     // ✅ Send email notification
