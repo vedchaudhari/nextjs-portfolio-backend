@@ -1,33 +1,21 @@
-// server.js
-require('dotenv').config();
-require('express-async-errors');
 const express = require('express');
+const mongoose = require('mongoose');
 const cors = require('cors');
-const connectDB = require('./db/db.js');
+require('dotenv').config();
+
 const contactRoutes = require('./routes/contact.route.js');
+const connectDB = require('./db/db.js');
 
 const app = express();
 
-// Middleware
+// Middlewares
 app.use(cors());
 app.use(express.json());
 
 // Routes
 app.use('/contact', contactRoutes);
 
-// Connect DB
-connectDB();
-
-// Root endpoint
-app.get('/', (req, res) => {
-  res.send('Contact Backend is Running 🚀');
-});
-
-// Global error handler
-app.use((err, req, res, next) => {
-  console.error('Unhandled Error:', err);
-  res.status(500).json({ success: false, error: 'Internal Server Error' });
-});
+connectDB(process.env.MONGO_URI)
 
 // Start server
 const PORT = process.env.PORT || 5000;

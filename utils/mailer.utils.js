@@ -1,100 +1,186 @@
+// // utils/mailer.util.js
+// const { Resend } = require('resend');
+// const resend = new Resend(process.env.RESEND_API_KEY);
+
+// async function sendContactEmail({ name, email, mobile, message }) {
+//     const toEmail = process.env.TO_EMAIL;
+//     const fromEmail = process.env.FROM_EMAIL;
+
+//     try {
+//         const html = `
+//       <div style="font-family: Arial, sans-serif; line-height:1.5;">
+//         <h2>New Contact Message from Portfolio</h2>
+//         <p><strong>Name:</strong> ${name || '—'}</p>
+//         <p><strong>Email:</strong> ${email || '—'}</p>
+//         <p><strong>Mobile:</strong> ${mobile || '—'}</p>
+//         <hr/>
+//         <h3>Message:</h3>
+//         <p>${message || '—'}</p>
+//       </div>
+//     `;
+
+//         const response = await resend.emails.send({
+//             from: `Portfolio Contact <${fromEmail}>`, // must be a verified sender in Resend
+//             to: toEmail,
+//             subject: `📩 New message from ${name || 'Unknown User'}`,
+//             html,
+//         });
+
+//         console.log('✅ Email sent successfully:', response);
+//         return response;
+//     } catch (err) {
+//         console.error('❌ Error sending email via Resend:', err.message);
+//         throw new Error('Failed to send contact email');
+//     }
+// }
+
+// module.exports = { sendContactEmail };
+
+
+
+
+
+
+
 // utils/mailer.util.js
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
+const resend = new Resend(process.env.RESEND_API_KEY);
 
-/**
- * Create transporter using SMTP (Gmail example). For production,
- */
-const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 465,
-    secure: true, // true for 465, false for other ports
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-    },
-});
+async function sendContactEmail({ name, email, mobile, message }) {
+  const toEmail = process.env.TO_EMAIL;
+  const fromEmail = process.env.FROM_EMAIL;
 
-/**
- * Verify transporter on startup so you get early feedback if creds are wrong.
- */
-transporter.verify()
-    .then(() => console.log('📨 Mailer ready'))
-    .catch((err) => {
-        console.warn('⚠️ Mailer verification failed:', err?.message || err);
+  try {
+    const html = `
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>New Contact Message</title>
+        <style>
+          body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f7f9fb;
+            color: #333;
+          }
+
+          .container {
+            max-width: 600px;
+            margin: 24px auto;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            overflow: hidden;
+          }
+
+          .header {
+            background: #0078d7;
+            color: #ffffff;
+            text-align: center;
+            padding: 24px 16px;
+          }
+
+          .header h2 {
+            margin: 0;
+            font-size: 22px;
+          }
+
+          .content {
+            padding: 24px;
+          }
+
+          .content p {
+            font-size: 15px;
+            margin: 8px 0;
+          }
+
+          .label {
+            font-weight: 600;
+            color: #0078d7;
+          }
+
+          .message-box {
+            background-color: #f3f6fa;
+            border-left: 4px solid #0078d7;
+            padding: 16px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-size: 15px;
+            line-height: 1.5;
+          }
+
+          footer {
+            background-color: #fafafa;
+            border-top: 1px solid #eee;
+            text-align: center;
+            padding: 16px;
+            font-size: 13px;
+            color: #777;
+          }
+
+          footer a {
+            color: #0078d7;
+            text-decoration: none;
+          }
+
+          @media screen and (max-width: 600px) {
+            .container {
+              margin: 12px;
+            }
+            .header h2 {
+              font-size: 20px;
+            }
+            .content {
+              padding: 16px;
+            }
+            .message-box {
+              font-size: 14px;
+            }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h2>New Contact Message</h2>
+            <p>via Portfolio Website</p>
+          </div>
+
+          <div class="content">
+            <p><span class="label">👤 Name:</span> ${name || '—'}</p>
+            <p><span class="label">📧 Email:</span> ${email || '—'}</p>
+            <p><span class="label">📱 Mobile:</span> ${mobile || '—'}</p>
+
+            <div class="message-box">
+              <p><strong>Message:</strong></p>
+              <p>${message || '—'}</p>
+            </div>
+          </div>
+
+          <footer>
+            <p>Sent automatically from your <a href="https://resend.com">contact form</a>.</p>
+          </footer>
+        </div>
+      </body>
+      </html>
+    `;
+
+    const response = await resend.emails.send({
+      from: `Portfolio Contact <${fromEmail}>`,
+      to: toEmail,
+      subject: `📩 New message from ${name || 'Unknown User'}`,
+      html,
     });
 
-/**
- * sendContactEmail
- * @param {Object} payload
- * @param {string} payload.name
- * @param {string} [payload.email]
- * @param {string} [payload.mobile]
- * @param {string} payload.message
- * @param {string} [payload.ip]
- * @param {string} [payload.userAgent]
- */
-async function sendContactEmail({ name, email, mobile, message, ip, userAgent }) {
-    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-        throw new Error('Email credentials are not set in environment variables');
-    }
-
-    const to = process.env.TO_EMAIL || process.env.EMAIL_USER;
-    const subject = `📩 New contact form message from ${name || 'Unknown'}`;
-
-    const textBody = [
-        `Name: ${name || '—'}`,
-        `Email: ${email || '—'}`,
-        `Mobile: ${mobile || '—'}`,
-        `IP: ${ip || '—'}`,
-        `User Agent: ${userAgent || '—'}`,
-        '',
-        'Message:',
-        message || '—'
-    ].join('\n');
-
-    const htmlBody = `
-    <div style="font-family: Arial, sans-serif; line-height:1.4;">
-      <h2>New contact message</h2>
-      <p><strong>Name:</strong> ${escapeHtml(name || '—')}</p>
-      <p><strong>Email:</strong> ${escapeHtml(email || '—')}</p>
-      <p><strong>Mobile:</strong> ${escapeHtml(mobile || '—')}</p>
-      <p><strong>IP:</strong> ${escapeHtml(ip || '—')}</p>
-      <p><strong>User Agent:</strong> ${escapeHtml(userAgent || '—')}</p>
-      <hr/>
-      <h3>Message</h3>
-      <p>${nl2br(escapeHtml(message || '—'))}</p>
-    </div>
-  `;
-
-    const mailOptions = {
-        from: `"Website Contact" <${process.env.EMAIL_USER}>`,
-        to,
-        subject,
-        text: textBody,
-        html: htmlBody,
-    };
-
-    // sendMail returns an info object or throws an error
-    return transporter.sendMail(mailOptions);
-}
-
-/**
- * Basic HTML escaping to avoid accidental injection in email content.
- */
-function escapeHtml(str) {
-    return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
-}
-
-/**
- * convert newline to <br/>
- */
-function nl2br(str) {
-    return String(str).replace(/\r\n|\n\r|\r|\n/g, '<br/>');
+    console.log('✅ Email sent successfully:', response);
+    return response;
+  } catch (err) {
+    console.error('❌ Error sending email via Resend:', err.message);
+    throw new Error('Failed to send contact email');
+  }
 }
 
 module.exports = { sendContactEmail };
