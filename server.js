@@ -65,7 +65,7 @@ app.get('/', (req, res) => {
 app.get('/api/health', (req, res) => {
     res.status(200).json({
         success: true,
-        message: 'Server is healthy',
+        message: 'Server is running healthy',
         uptime: process.uptime(),
         timestamp: new Date().toISOString(),
         database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
