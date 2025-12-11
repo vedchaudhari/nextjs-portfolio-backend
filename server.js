@@ -84,11 +84,11 @@ app.use(errorHandler);
 // Connect to Database
 connectDB();
 
-// Start the cron job ONLY in production
-if (process.env.NODE_ENV === 'production') {
-    job.start();
-    logger.info(`Cron job started with schedule: ${process.env.CRON_SCHEDULE || '*/14 * * * *'}`);
-}
+// // Start the cron job ONLY in production
+// if (process.env.NODE_ENV === 'production') {
+//     job.start();
+//     logger.info(`Cron job started with schedule: ${process.env.CRON_SCHEDULE || '*/14 * * * *'}`);
+// }
 
 // Graceful Shutdown
 const gracefulShutdown = async (signal) => {
