@@ -22,7 +22,15 @@ validateEnv();
 const app = express();
 
 // Security Middlewares
-app.use(helmet()); // Set security headers
+if (process.env.NODE_ENV === "production") {
+  app.use(helmet()); // includes HSTS
+} else {
+  app.use(
+    helmet({
+      hsts: false
+    })
+  );
+}
 app.use(mongoSanitize()); // Prevent MongoDB injection
 app.use(xss()); // Prevent XSS attacks
 
