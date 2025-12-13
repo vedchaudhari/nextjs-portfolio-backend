@@ -52,7 +52,7 @@ app.use('/api', generalLimiter);
 app.get('/', (req, res) => {
     res.status(200).json({
         success: true,
-        message: 'Portfolio Backend API is running ✅',
+        message: 'Portfolio Backend API running ✅',
         version: '2.0.0',
         endpoints: {
             contact: '/api/contact',
