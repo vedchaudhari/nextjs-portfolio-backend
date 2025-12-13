@@ -23,4 +23,4 @@ jobs:
             cd ~/nextjs-portfolio-backend
             git pull origin main
             npm install --force
-            pm2 restart portfolio-backend
+            pm2 restart portfolio-backend-deployment
